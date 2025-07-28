@@ -8,4 +8,4 @@ jobs:
          - uses: docker://docker.io/fluidattacks/skims:latest
            name: skimsStandalone
            with:
-             args: skims scan https://github.com/fgomez1985/log4shell-vulnerable-app.git
+             args: skims scan .
