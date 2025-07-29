@@ -1,40 +1,35 @@
 name: FluidAttacks Pipeline
-
 on: [push, pull_request]
 
 jobs:
   # 1. Escaneo de dependencias (SCA) modo tolerante
-  sca_tolerant:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: SCA scan (tolerant)
-        uses: docker://docker.io/fluidattacks/sca:latest
-        with:
-          args: sca scan .
+   SCA:
+      runs-on: ubuntu-latest
+      steps:
+         - uses: actions/checkout@f095bcc56b7c2baf48f3ac70d6d6782f4f553222
+         - uses: docker://docker.io/fluidattacks/sca:latest
+           name: SCA_Fluidattacks
+           with:
+             args: sca scan .
 
   # 2. Escaneo SAST modo tolerante; sólo se ejecuta si el anterior terminó
-  sast_tolerant:
-    needs: sca_tolerant
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: SAST scan (tolerant)
-        uses: docker://docker.io/fluidattacks/sast:latest
-        with:
-          args: sast scan .
+   SAST:
+      runs-on: ubuntu-latest
+      steps:
+         - uses: actions/checkout@f095bcc56b7c2baf48f3ac70d6d6782f4f553222
+         - uses: docker://docker.io/fluidattacks/sca:latest
+           name: SAST_Fluidattacks
+           with:
+             args: sast scan .
 
   # 3. Validación con CI Agent según severidad
-  validate_forces:
-    needs: sast_strict
+  forces:
     runs-on: ubuntu-latest
+    container:
+      image: fluidattacks/forces:latest
+      env:
+        TOKEN: <your-token>
+        REPO_NAME: <repository name>
     steps:
-      - name: Ejecutar CI Agent con umbral de severidad 5.0
-        uses: docker://docker.io/fluidattacks/forces:latest
-        # En este paso empleamos un secreto llamado TOKEN_AGENT,
-        # configurado previamente en GitHub → Settings → Secrets.
-        with:
-          args: >
-            forces --token ${{ secrets.TOKEN_AGENT }}
-                   --strict
-                   --breaking 8.0
+      - name: Run Agent check
+        run: orces --token ${{ secrets.TOKEN_AGENT }} --strict --breaking 8.0
