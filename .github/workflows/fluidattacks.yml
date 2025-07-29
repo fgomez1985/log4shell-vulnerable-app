@@ -21,15 +21,3 @@ jobs:
            name: SAST_Fluidattacks
            with:
              args: sast scan .
-
-  # 3. Validación con CI Agent según severidad
-  forces:
-    runs-on: ubuntu-latest
-    container:
-      image: fluidattacks/forces:latest
-      env:
-        TOKEN: <your-token>
-        REPO_NAME: <repository name>
-    steps:
-      - name: Run Agent check
-        run: orces --token ${{ secrets.TOKEN_AGENT }} --strict --breaking 8.0
