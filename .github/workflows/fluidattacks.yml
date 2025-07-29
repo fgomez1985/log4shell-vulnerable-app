@@ -21,10 +21,11 @@ jobs:
            name: SAST_Fluidattacks
            with:
              args: sast scan .
+             
   forces:
     runs-on: ubuntu-latest
     container:
       image: fluidattacks/forces:latest
     steps:
       - name: Run Agent check
-        run: forces --token $TOKEN_AGENT
+        run: forces --token ${{ secrets.TOKEN_AGENT }}
