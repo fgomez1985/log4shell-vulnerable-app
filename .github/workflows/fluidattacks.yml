@@ -2,8 +2,15 @@ name: FluidAttacks Pipeline
 on: [push, pull_request]
 
 jobs:
+  forces:
+    runs-on: ubuntu-latest
+    container:
+      image: fluidattacks/forces:latest
+    steps:
+      - name: Run Agent check
+        run: forces --token ${{ secrets.TOKEN_AGENT }}
   # 1. Escaneo de dependencias (SCA) modo tolerante
-   SCA:
+  SCA:
       runs-on: ubuntu-latest
       steps:
          - uses: actions/checkout@f095bcc56b7c2baf48f3ac70d6d6782f4f553222
@@ -13,7 +20,7 @@ jobs:
              args: sca scan .
 
   # 2. Escaneo SAST modo tolerante; sólo se ejecuta si el anterior terminó
-   SAST:
+  SAST:
       runs-on: ubuntu-latest
       steps:
          - uses: actions/checkout@f095bcc56b7c2baf48f3ac70d6d6782f4f553222
@@ -21,11 +28,3 @@ jobs:
            name: SAST_Fluidattacks
            with:
              args: sast scan .
-             
-  forces:
-    runs-on: ubuntu-latest
-    container:
-      image: fluidattacks/forces:latest
-    steps:
-      - name: Run Agent check
-        run: forces --token ${{ secrets.TOKEN_AGENT }}
